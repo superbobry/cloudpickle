@@ -139,16 +139,15 @@ class CloudPickleTest(unittest.TestCase):
         self.assertTrue("exit" in func_code.co_names)
         cloudpickle.dumps(foo)
 
+    @pytest.mark.skipif(sys.version_info >= (3, ),
+                        reason="buffer has been removed in Python 3")
     def test_buffer(self):
-        try:
-            buffer_obj = buffer("Hello")
-            buffer_clone = pickle_depickle(buffer_obj, protocol=self.protocol)
-            self.assertEqual(buffer_clone, str(buffer_obj))
-            buffer_obj = buffer("Hello", 2, 3)
-            buffer_clone = pickle_depickle(buffer_obj, protocol=self.protocol)
-            self.assertEqual(buffer_clone, str(buffer_obj))
-        except NameError:  # Python 3 does no longer support buffers
-            pass
+        buffer_obj = buffer("Hello")
+        buffer_clone = pickle_depickle(buffer_obj, protocol=self.protocol)
+        self.assertEqual(buffer_clone, str(buffer_obj))
+        buffer_obj = buffer("Hello", 2, 3)
+        buffer_clone = pickle_depickle(buffer_obj, protocol=self.protocol)
+        self.assertEqual(buffer_clone, str(buffer_obj))
 
     def test_memoryview(self):
         buffer_obj = memoryview(b"Hello")
